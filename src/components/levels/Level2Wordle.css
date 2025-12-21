@@ -1,0 +1,171 @@
+.wordle-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  /* Transparent to show global background */
+  background-color: transparent;
+  color: var(--color-text);
+  padding: 1rem;
+  padding-top: 4rem; /* More space for fixed navbar if any */
+  font-family: var(--font-body);
+}
+
+.level-title {
+  color: var(--color-primary-dark);
+  margin-bottom: 0.5rem;
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+}
+
+.instruction {
+  color: var(--color-text);
+  margin-bottom: 2rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.wordle-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--backdrop-blur));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow);
+  border: 1px solid var(--glass-border);
+}
+
+.wordle-row {
+  display: flex;
+  gap: 8px;
+}
+
+.wordle-cell {
+  width: 50px;
+  height: 50px;
+  border: 2px solid rgba(190, 18, 60, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  color: var(--color-primary-dark);
+  transition: all 0.3s ease;
+}
+
+.wordle-cell.filled {
+  border-color: var(--color-primary);
+  animation: pop 0.1s ease-in-out;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.wordle-cell.green {
+  background-color: #10b981; /* Keep standard green for success */
+  border-color: #10b981;
+  color: white;
+}
+
+.wordle-cell.yellow {
+  background-color: #f59e0b; /* Amber 500 */
+  border-color: #f59e0b;
+  color: white;
+}
+
+.wordle-cell.grey {
+  background-color: #9ca3af; /* Gray 400 */
+  border-color: #9ca3af;
+  color: white;
+}
+
+.hint-banner {
+  background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-accent) 100%);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 50px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes pop {
+  0% { transform: scale(0.8); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Teclado */
+.keyboard {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border);
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.key-btn {
+  font-family: inherit;
+  font-weight: bold;
+  border: none;
+  padding: 0;
+  min-width: 30px;
+  height: 45px;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: var(--color-text);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.key-btn:hover {
+  background-color: var(--color-secondary);
+  color: white;
+}
+
+.key-btn.green {
+  background-color: #10b981;
+  color: white;
+}
+
+.key-btn.yellow {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.key-btn.grey {
+  background-color: #9ca3af;
+  color: white;
+}
+
+.key-btn.wide {
+  flex: 1.5;
+  font-size: 0.8rem;
+}
