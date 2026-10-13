@@ -1,249 +1,216 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { useGame } from '../../context/GameContext';
-import { Delete, Check, RefreshCw, Lightbulb } from 'lucide-react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Delete, CornerDownLeft, Lightbulb, RotateCcw } from 'lucide-react';
+import LevelLayout from '../LevelLayout';
 import './Level2Wordle.css';
 
-// Palabra secreta (6 letras)
-const SOLUTION = "MADRID";
-const WORD_LENGTH = 6;
+// Palabra secreta y pistas que aparecen según los intentos fallados
+const SOLUTION = 'MADRID';
+const WORD_LENGTH = SOLUTION.length;
 const MAX_TURNS = 6;
+const HINTS = [
+  { after: 2, text: 'Un momento junto a mí' },
+  { after: 3, text: 'Fue un viaje' },
+];
+const KEY_ROWS = ['QWERTYUIOP', 'ASDFGHJKLÑ', 'ZXCVBNM'];
+const STATUS_RANK = { absent: 1, present: 2, correct: 3 };
+
+const evaluate = (guess) => {
+  const remaining = [...SOLUTION];
+  const result = [...guess].map((letter, i) => {
+    if (SOLUTION[i] === letter) {
+      remaining[i] = null;
+      return { letter, status: 'correct' };
+    }
+    return { letter, status: 'absent' };
+  });
+  result.forEach((cell) => {
+    if (cell.status === 'correct') return;
+    const idx = remaining.indexOf(cell.letter);
+    if (idx !== -1) {
+      cell.status = 'present';
+      remaining[idx] = null;
+    }
+  });
+  return result;
+};
 
 const Level2Wordle = () => {
-  const { completeLevel } = useGame();
-  const [turn, setTurn] = useState(0);
-  const [currentGuess, setCurrentGuess] = useState('');
-  const [guesses, setGuesses] = useState([...Array(MAX_TURNS)]); 
-  const [history, setHistory] = useState([]); 
-  const [isCorrect, setIsCorrect] = useState(false);
-  const [message, setMessage] = useState('');
-  const [gameOver, setGameOver] = useState(false);
-  const [hint, setHint] = useState(null);
+  const [rows, setRows] = useState([]);
+  const [current, setCurrent] = useState('');
+  const [status, setStatus] = useState('playing'); // playing | won | lost
+  const [toast, setToast] = useState('');
+  const [shake, setShake] = useState(false);
+  const toastTimer = useRef();
 
-  // Manejo de teclas físicas
-  useEffect(() => {
-    const handleKeyup = (e) => {
-      if (gameOver || isCorrect) return;
+  const flash = (msg) => {
+    setToast(msg);
+    setShake(true);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => {
+      setToast('');
+      setShake(false);
+    }, 1800);
+  };
 
-      const key = e.key.toUpperCase();
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
+
+  const handleKey = useCallback(
+    (key) => {
+      if (status !== 'playing') return;
 
       if (key === 'ENTER') {
-        if (currentGuess.length !== WORD_LENGTH) {
-          showMessage("Faltan letras");
-          return;
-        }
-        submitGuess();
+        if (current.length !== WORD_LENGTH) return flash('Faltan letras');
+        if (rows.some((r) => r.word === current)) return flash('Ya probaste esa palabra');
+        const next = [...rows, { word: current, cells: evaluate(current) }];
+        setRows(next);
+        setCurrent('');
+        if (current === SOLUTION) setStatus('won');
+        else if (next.length === MAX_TURNS) setStatus('lost');
+        return;
       }
       if (key === 'BACKSPACE') {
-        setCurrentGuess((prev) => prev.slice(0, -1));
+        setCurrent((c) => c.slice(0, -1));
         return;
       }
-      if (/^[A-ZÑ]$/.test(key)) {
-        if (currentGuess.length < WORD_LENGTH) {
-          setCurrentGuess((prev) => prev + key);
-        }
+      if (/^[A-ZÑ]$/.test(key) && current.length < WORD_LENGTH) {
+        setCurrent((c) => c + key);
       }
-    };
+    },
+    [status, current, rows]
+  );
 
-    window.addEventListener('keyup', handleKeyup);
-    return () => window.removeEventListener('keyup', handleKeyup);
-  }, [currentGuess, turn, isCorrect, gameOver]);
-
-  // Lógica de Pistas automáticas
   useEffect(() => {
-    if (turn === 2) { // Intento 3 (índice 2)
-      setHint("Pista: Momento junto a mi");
-    } else if (turn === 3) { // Intento 4 (índice 3)
-      setHint("Pista: Viaje");
-    }
-  }, [turn]);
+    const onKeyDown = (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      handleKey(e.key.toUpperCase());
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [handleKey]);
 
-  // Enviar intento
-  const submitGuess = () => {
-    if (history.includes(currentGuess)) {
-      showMessage("Ya probaste esa palabra");
-      return;
-    }
-
-    const formattedGuess = formatGuess();
-    addNewGuess(formattedGuess);
+  const restart = () => {
+    setRows([]);
+    setCurrent('');
+    setStatus('playing');
   };
 
-  // Formatear intento (calcular colores)
-  const formatGuess = () => {
-    let solutionChars = [...SOLUTION];
-    let formattedGuess = [...currentGuess].map((l) => ({ key: l, color: 'grey' }));
+  // Mejor estado conocido de cada letra para colorear el teclado
+  const keyStatus = {};
+  rows.forEach(({ cells }) =>
+    cells.forEach(({ letter, status: s }) => {
+      if (!keyStatus[letter] || STATUS_RANK[s] > STATUS_RANK[keyStatus[letter]]) keyStatus[letter] = s;
+    })
+  );
 
-    // Paso 1: Encontrar verdes (posición correcta)
-    formattedGuess.forEach((l, i) => {
-      if (SOLUTION[i] === l.key) {
-        formattedGuess[i].color = 'green';
-        solutionChars[i] = null;
-      }
-    });
-
-    // Paso 2: Encontrar amarillos (letra correcta, posición incorrecta)
-    formattedGuess.forEach((l, i) => {
-      if (l.color !== 'green' && solutionChars.includes(l.key)) {
-        formattedGuess[i].color = 'yellow';
-        solutionChars[solutionChars.indexOf(l.key)] = null;
-      }
-    });
-
-    return formattedGuess;
-  };
-
-  // Añadir intento al estado
-  const addNewGuess = (formattedGuess) => {
-    if (currentGuess === SOLUTION) {
-      setIsCorrect(true);
-      setTimeout(() => completeLevel(2), 2000); 
-      showMessage("¡Correcto! Eres mi persona favorita ❤️");
-    }
-
-    setGuesses((prevGuesses) => {
-      let newGuesses = [...prevGuesses];
-      newGuesses[turn] = formattedGuess;
-      return newGuesses;
-    });
-
-    setHistory((prevHistory) => [...prevHistory, currentGuess]);
-    setTurn((prevTurn) => prevTurn + 1);
-    setCurrentGuess('');
-
-    if (turn >= MAX_TURNS - 1 && currentGuess !== SOLUTION) {
-      setGameOver(true);
-      showMessage(`Oh no... La palabra era ${SOLUTION}`);
-    }
-  };
-
-  const showMessage = (msg) => {
-    setMessage(msg);
-    setTimeout(() => setMessage(''), 3000);
-  };
-
-  // Teclado virtual
-  const handleKeyClick = (key) => {
-    if (gameOver || isCorrect) return;
-
-    if (key === 'ENTER') {
-      if (currentGuess.length !== WORD_LENGTH) {
-        showMessage("Faltan letras");
-        return;
-      }
-      submitGuess();
-    } else if (key === 'BACKSPACE') {
-      setCurrentGuess((prev) => prev.slice(0, -1));
-    } else {
-      if (currentGuess.length < WORD_LENGTH) {
-        setCurrentGuess((prev) => prev + key);
-      }
-    }
-  };
-
-  // Obtener color para teclas del teclado virtual
-  const getKeyColor = (key) => {
-    let color = '';
-    guesses.slice(0, turn).forEach((guess) => {
-      guess.forEach((l) => {
-        if (l.key === key) {
-          if (l.color === 'green') color = 'green';
-          else if (l.color === 'yellow' && color !== 'green') color = 'yellow';
-          else if (l.color === 'grey' && color !== 'green' && color !== 'yellow') color = 'grey';
-        }
-      });
-    });
-    return color;
-  };
+  const visibleHints = HINTS.filter((h) => rows.length >= h.after || status === 'lost');
 
   return (
-    <div className="wordle-container">
-      <h2 className="level-title">Nivel 2: Palabra Secreta</h2>
-      <p className="instruction">Adivina la palabra de 6 letras</p>
-      
-      {/* Pista Dinámica */}
-      {hint && (
-        <motion.div 
-          className="hint-banner"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <Lightbulb size={18} /> {hint}
-        </motion.div>
-      )}
+    <LevelLayout
+      level={2}
+      title="La palabra secreta"
+      subtitle={`Adivina la palabra de ${WORD_LENGTH} letras. Tienes ${MAX_TURNS} intentos.`}
+      won={status === 'won'}
+      winTitle="¡Madrid!"
+      winText="Ese viaje sigue siendo uno de mis recuerdos favoritos contigo."
+    >
+      <div className="wordle-legend">
+        <span><i className="correct" /> En su sitio</span>
+        <span><i className="present" /> Está, pero en otro sitio</span>
+        <span><i className="absent" /> No está</span>
+      </div>
 
-      {/* Grid de palabras */}
-      <div className="wordle-grid">
-        {guesses.map((guess, i) => {
-          if (turn === i) {
-            return (
-              <div key={i} className="wordle-row current">
-                {[...Array(WORD_LENGTH)].map((_, j) => (
-                  <div key={j} className="wordle-cell filled">
-                    {currentGuess[j]}
-                  </div>
-                ))}
-              </div>
-            );
-          }
+      <div className="wordle-board">
+        {Array.from({ length: MAX_TURNS }, (_, r) => {
+          const row = rows[r];
+          const isCurrent = r === rows.length && status === 'playing';
           return (
-            <div key={i} className="wordle-row">
-              {guess &&
-                guess.map((l, j) => (
-                  <motion.div
-                    key={j}
-                    className={`wordle-cell ${l.color}`}
-                    initial={{ rotateX: 0 }}
-                    animate={{ rotateX: 360 }}
-                    transition={{ delay: j * 0.2 }}
-                  >
-                    {l.key}
-                  </motion.div>
-                ))}
-              {!guess &&
-                [...Array(WORD_LENGTH)].map((_, j) => (
-                  <div key={j} className="wordle-cell"></div>
-                ))}
-            </div>
+            <motion.div
+              key={r}
+              className="wordle-row"
+              animate={isCurrent && shake ? { x: [0, -8, 8, -6, 6, 0] } : { x: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              {Array.from({ length: WORD_LENGTH }, (_, c) => {
+                if (row) {
+                  const cell = row.cells[c];
+                  return (
+                    <motion.div
+                      key={c}
+                      className={`wordle-cell ${cell.status}`}
+                      initial={{ rotateX: -90 }}
+                      animate={{ rotateX: 0 }}
+                      transition={{ delay: c * 0.12, duration: 0.3 }}
+                    >
+                      {cell.letter}
+                    </motion.div>
+                  );
+                }
+                const letter = isCurrent ? current[c] : '';
+                return (
+                  <div key={c} className={`wordle-cell ${letter ? 'filled' : ''}`}>
+                    {letter}
+                  </div>
+                );
+              })}
+            </motion.div>
           );
         })}
+        <AnimatePresence>
+          {toast && (
+            <motion.div
+              className="wordle-toast"
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+            >
+              {toast}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {message && <div className="message-toast">{message}</div>}
-
-      {/* Teclado Virtual */}
-      <div className="keyboard">
-        {['QWERTYUIOP', 'ASDFGHJKLÑ', 'ZXCVBNM'].map((row, i) => (
-          <div key={i} className="keyboard-row">
-            {row.split('').map((key) => (
-              <button
-                key={key}
-                className={`key-btn ${getKeyColor(key)}`}
-                onClick={() => handleKeyClick(key)}
-              >
-                {key}
-              </button>
-            ))}
-            {i === 2 && (
-              <>
-                <button className="key-btn action" onClick={() => handleKeyClick('BACKSPACE')}>
-                  <Delete size={20} />
-                </button>
-                <button className="key-btn action" onClick={() => handleKeyClick('ENTER')}>
-                  <Check size={20} />
-                </button>
-              </>
-            )}
-          </div>
-        ))}
-      </div>
-      
-      {gameOver && (
-          <button className="reset-btn" onClick={() => window.location.reload()}>
-            <RefreshCw size={20} /> Reintentar
-          </button>
+      {visibleHints.length > 0 && (
+        <div className="wordle-hints">
+          {visibleHints.map((h) => (
+            <motion.div key={h.text} className="hint-note" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+              <Lightbulb size={16} /> {h.text}
+            </motion.div>
+          ))}
+        </div>
       )}
-    </div>
+
+      {status === 'lost' ? (
+        <div className="wordle-lost">
+          <p>¡Casi! Las pistas siguen ahí para ayudarte.</p>
+          <button className="btn btn-primary" onClick={restart}>
+            <RotateCcw size={18} /> Intentar de nuevo
+          </button>
+        </div>
+      ) : (
+        <div className="keyboard">
+          {KEY_ROWS.map((row, i) => (
+            <div key={row} className="keyboard-row">
+              {i === 2 && (
+                <button className="key wide" onClick={() => handleKey('ENTER')} aria-label="Enviar">
+                  <CornerDownLeft size={18} />
+                </button>
+              )}
+              {[...row].map((k) => (
+                <button key={k} className={`key ${keyStatus[k] ?? ''}`} onClick={() => handleKey(k)}>
+                  {k}
+                </button>
+              ))}
+              {i === 2 && (
+                <button className="key wide" onClick={() => handleKey('BACKSPACE')} aria-label="Borrar">
+                  <Delete size={18} />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </LevelLayout>
   );
 };
 

@@ -19,44 +19,37 @@ Esta es una aplicación web interactiva diseñada como un regalo romántico. Con
 Para que el regalo sea verdaderamente especial, debes editar el código con tus propios recuerdos, fotos y mensajes. Aquí te indico qué archivos modificar:
 
 ### 1. Mensaje de Bienvenida
-*   **Archivo:** `src/components/WelcomeScreen.jsx`
-*   **Editar:** Cambia el texto dentro de `<h1>` y `<p>` para poner tu propio mensaje de bienvenida.
+*   **Archivo:** `src/components/WelcomeScreen.jsx` — título y texto de bienvenida.
 
-### 2. Nivel 1: Escape Room (El Comienzo)
-*   **Archivo:** `src/components/levels/Level1Escape.jsx`
-*   **Editar:** Puedes cambiar los objetos donde se busca la llave y los mensajes que aparecen. Por defecto, la llave está en la `plant` (planta).
+### 2. Nivel 1: Parejas de recuerdos
+*   **Archivo:** `src/components/levels/Level1Memory.jsx`
+*   **Editar:** `SYMBOLS` con los iconos de `lucide-react` que os representen.
 
-### 3. Nivel 2: Memoria
-*   **Archivo:** `src/components/levels/Level2Memory.jsx`
-*   **Editar:** Puedes cambiar los iconos importados de `lucide-react` si prefieres otros símbolos.
+### 3. Nivel 2: La palabra secreta
+*   **Archivo:** `src/components/levels/Level2Wordle.jsx`
+*   **Editar:** `SOLUTION` (la palabra) y `HINTS` (pistas que aparecen tras X intentos).
 
-### 4. Nivel 3: Línea de Tiempo
-*   **Archivo:** `src/components/levels/Level3Timeline.jsx`
-*   **Editar:** Modifica `initialEvents` con tus propios hitos de relación. Asegúrate de actualizar `correctOrder` con los IDs en el orden correcto.
+### 4. Nivel 3: Atrapa mi corazón
+*   **Archivo:** `src/components/levels/Level3Catch.jsx`
+*   **Editar:** `GOAL`, `LIVES` y `BAD_CHANCE` para ajustar la dificultad.
 
-### 5. Nivel 4: Puzzle de Imagen
-*   **Archivo:** `src/components/levels/Level4Puzzle.jsx`
-*   **Editar:** Cambia la constante `IMAGE_URL` por la URL de una foto vuestra. Puedes subir la foto a un servicio como Imgur o ponerla en la carpeta `public` y usar una ruta relativa (ej. `/mifoto.jpg`).
+### 5. Nivel 4: Puzzle deslizante
+*   **Archivo:** `src/components/levels/Level4Sliding.jsx`
+*   **Editar:** `IMAGE_URL` (foto en `public/`) e `IMAGE_RATIO` (ancho / alto de la foto).
 
-### 6. Nivel 5: Mensaje Cifrado
-*   **Archivo:** `src/components/levels/Level5Cipher.jsx`
-*   **Editar:**
-    *   `SECRET_ANSWER`: La respuesta que ella debe escribir.
-    *   `ENCRYPTED_MSG`: El mensaje cifrado que ella ve.
-    *   (Tip: Usa un cifrado César simple, desplazando cada letra 1 posición, A->B, etc.)
+### 6. Nivel 5: Rueda de cifrado
+*   **Archivo:** `src/components/levels/Level5Decoder.jsx`
+*   **Editar:** `SECRET_ANSWER` (la frase) y `SHIFT` (cuántas posiciones se desplaza). El mensaje cifrado se calcula solo.
 
-### 7. Nivel 6: Escape Room
-*   **Archivo:** `src/components/levels/Level6Escape.jsx`
-*   **Editar:**
-    *   `FINAL_CODE`: El código numérico para salir.
-    *   `clues`: Las pistas y sus textos.
-    *   Puedes cambiar la imagen de fondo en `Level6Escape.css`.
+### 7. Nivel 6: Encuentra las diferencias
+*   **Archivo:** `src/components/levels/Level6Differences.jsx`
+*   **Editar:** `ORIGINAL_IMG`, `MODIFIED_IMG` y `DIFFERENCES` (posición en % de cada cambio y su pista).
 
 ### 8. Pantalla Final (El Regalo)
-*   **Archivo:** `src/components/FinalScreen.jsx`
-*   **Editar:**
-    *   Cambia el mensaje de felicitación.
-    *   Cambia el contenido del regalo en `<div className="gift-content">`.
+*   **Archivo:** `src/components/FinalScreen.jsx` — mensaje final y datos de la entrada.
+
+### Colores y tipografías
+*   **Archivo:** `src/index.css` — todas las variables de diseño están en `:root`.
 
 ## 🌍 Despliegue (Cómo enviárselo)
 

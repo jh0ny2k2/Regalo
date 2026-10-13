@@ -1,171 +1,161 @@
-.wordle-container {
+.wordle-legend {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 1rem;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.wordle-legend span {
+  display: inline-flex;
   align-items: center;
-  justify-content: flex-start;
-  min-height: 100vh;
-  /* Transparent to show global background */
-  background-color: transparent;
-  color: var(--color-text);
-  padding: 1rem;
-  padding-top: 4rem; /* More space for fixed navbar if any */
-  font-family: var(--font-body);
+  gap: 0.35rem;
 }
 
-.level-title {
-  color: var(--color-primary-dark);
-  margin-bottom: 0.5rem;
-  font-family: var(--font-heading);
-  font-size: 2.5rem;
-  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+.wordle-legend i {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
 }
 
-.instruction {
-  color: var(--color-text);
-  margin-bottom: 2rem;
-  font-weight: 500;
-  opacity: 0.8;
-}
+.wordle-legend .correct { background: var(--success); }
+.wordle-legend .present { background: var(--warn); }
+.wordle-legend .absent { background: var(--neutral); }
 
-.wordle-grid {
+.wordle-board {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--backdrop-blur));
-  border-radius: var(--radius-lg);
-  box-shadow: var(--glass-shadow);
-  border: 1px solid var(--glass-border);
+  gap: 7px;
+  perspective: 600px;
 }
 
 .wordle-row {
-  display: flex;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 7px;
 }
 
 .wordle-cell {
-  width: 50px;
-  height: 50px;
-  border: 2px solid rgba(190, 18, 60, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.8rem;
-  font-weight: bold;
+  width: clamp(42px, 12vw, 54px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  font-family: var(--font-heading);
+  font-size: clamp(1.3rem, 5vw, 1.65rem);
+  font-weight: 600;
+  color: var(--wine-deep);
   text-transform: uppercase;
-  background-color: rgba(255, 255, 255, 0.5);
-  border-radius: 8px;
-  color: var(--color-primary-dark);
-  transition: all 0.3s ease;
 }
 
 .wordle-cell.filled {
-  border-color: var(--color-primary);
-  animation: pop 0.1s ease-in-out;
-  background-color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(122, 31, 61, 0.45);
+  animation: pop 0.12s ease-out;
 }
 
-.wordle-cell.green {
-  background-color: #10b981; /* Keep standard green for success */
-  border-color: #10b981;
-  color: white;
+.wordle-cell.correct,
+.wordle-cell.present,
+.wordle-cell.absent {
+  color: #fff;
+  border-color: transparent;
 }
 
-.wordle-cell.yellow {
-  background-color: #f59e0b; /* Amber 500 */
-  border-color: #f59e0b;
-  color: white;
-}
-
-.wordle-cell.grey {
-  background-color: #9ca3af; /* Gray 400 */
-  border-color: #9ca3af;
-  color: white;
-}
-
-.hint-banner {
-  background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-accent) 100%);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 50px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1rem;
-  font-weight: bold;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
+.wordle-cell.correct { background: var(--success); }
+.wordle-cell.present { background: var(--warn); }
+.wordle-cell.absent { background: var(--neutral); }
 
 @keyframes pop {
-  0% { transform: scale(0.8); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
 }
 
-/* Teclado */
-.keyboard {
-  width: 100%;
-  max-width: 500px;
+.wordle-toast {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: var(--shadow-md);
+  z-index: 2;
+}
+
+.wordle-hints {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--glass-border);
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 360px;
+}
+
+.wordle-lost {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: var(--ink-soft);
+}
+
+.keyboard {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .keyboard-row {
   display: flex;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
 }
 
-.key-btn {
-  font-family: inherit;
-  font-weight: bold;
-  border: none;
-  padding: 0;
-  min-width: 30px;
-  height: 45px;
-  border-radius: 6px;
-  cursor: pointer;
-  background-color: rgba(255, 255, 255, 0.8);
-  color: var(--color-text);
+.key {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-transform: uppercase;
-  font-size: 0.9rem;
-  transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  max-width: 42px;
+  height: 50px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: var(--surface-soft);
+  box-shadow: inset 0 0 0 1px var(--line), 0 2px 0 rgba(122, 31, 61, 0.08);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  transition: transform 0.1s, background-color 0.2s;
 }
 
-.key-btn:hover {
-  background-color: var(--color-secondary);
-  color: white;
+.key:active {
+  transform: translateY(1px) scale(0.96);
 }
 
-.key-btn.green {
-  background-color: #10b981;
-  color: white;
+.key:hover {
+  background: var(--blush);
 }
 
-.key-btn.yellow {
-  background-color: #f59e0b;
-  color: white;
+.key.wide {
+  flex: 1.6;
+  max-width: 64px;
+  color: var(--wine);
 }
 
-.key-btn.grey {
-  background-color: #9ca3af;
-  color: white;
+.key.correct,
+.key.present,
+.key.absent {
+  color: #fff;
+  box-shadow: none;
 }
 
-.key-btn.wide {
-  flex: 1.5;
-  font-size: 0.8rem;
-}
+.key.correct { background: var(--success); }
+.key.present { background: var(--warn); }
+.key.absent { background: var(--neutral); }

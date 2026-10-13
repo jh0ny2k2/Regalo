@@ -1,4 +1,6 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useContext } from 'react';
+
+export const TOTAL_LEVELS = 6;
 
 const GameContext = createContext();
 
@@ -8,23 +10,17 @@ export const GameProvider = ({ children }) => {
   // 0 = Welcome Screen
   // 1-6 = Game Levels
   // 7 = Final Gift Screen
-  const [currentLevel, setCurrentLevel] = useState(0); 
-  const [unlockedLevels, setUnlockedLevels] = useState(1); // Max level unlocked (starts at 1)
-
-  // Load progress from localStorage on mount
-  useEffect(() => {
-    const savedLevel = localStorage.getItem('anniversary_game_progress');
-    if (savedLevel) {
-      const level = parseInt(savedLevel, 10);
-      setUnlockedLevels(level);
-      // Optional: Start at the latest unlocked level or Welcome screen?
-      // Let's start at Welcome screen so she sees the intro again, but can jump.
-      // Or maybe jump to where she left off if it's > 1.
-      if (level > 1 && level < 7) {
-        setCurrentLevel(level);
-      }
+  // Progreso guardado: si ya había empezado, retoma donde lo dejó
+  const [unlockedLevels, setUnlockedLevels] = useState(() => {
+    try {
+      return parseInt(localStorage.getItem('anniversary_game_progress'), 10) || 1;
+    } catch {
+      return 1;
     }
-  }, []);
+  });
+  const [currentLevel, setCurrentLevel] = useState(() =>
+    unlockedLevels > 1 && unlockedLevels <= TOTAL_LEVELS ? unlockedLevels : 0
+  );
 
   const completeLevel = (level) => {
     const nextLevel = level + 1;

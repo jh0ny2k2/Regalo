@@ -1,133 +1,97 @@
-.welcome-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+.welcome {
   min-height: 100vh;
-  /* Background handled globally, but we ensure transparency here */
-  background: transparent;
-  padding: 2rem;
-  text-align: center;
-  position: relative;
-  z-index: 1;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem 1rem;
 }
 
-/* Glass Card Container */
 .welcome-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--backdrop-blur));
-  -webkit-backdrop-filter: blur(var(--backdrop-blur));
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-  padding: 4rem 2rem;
-  border-radius: var(--radius-lg);
-  max-width: 600px;
   width: 100%;
+  max-width: 520px;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 36px;
+  box-shadow: var(--shadow-lg);
+  padding: 3rem 1.75rem 2.5rem;
 }
 
-.heart-wrapper {
-  margin-bottom: 2rem;
-  filter: drop-shadow(0 10px 20px rgba(190, 18, 60, 0.3));
-  animation: floatHeart 3s ease-in-out infinite;
+.welcome-heart {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--rose);
+  background: radial-gradient(circle at 30% 30%, #fff 0%, var(--blush) 70%);
+  box-shadow: 0 0 0 10px rgba(253, 238, 241, 0.6), 0 16px 30px -10px rgba(214, 51, 108, 0.45);
+  margin-bottom: 1.75rem;
 }
 
-@keyframes floatHeart {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-10px) scale(1.05); }
+.welcome-heart svg {
+  animation: beat 1.6s ease-in-out infinite;
 }
 
-.title {
-  font-family: var(--font-heading);
-  font-size: 3.5rem;
-  color: var(--color-primary-dark);
-  margin-bottom: 1.5rem;
+.welcome-title {
+  font-size: clamp(2.2rem, 8vw, 3.2rem);
+  line-height: 1.05;
+  margin: 0.75rem 0 1.25rem;
+}
+
+.welcome-title span {
+  display: block;
+  font-family: var(--font-script);
   font-weight: 700;
-  line-height: 1.2;
-  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+  font-size: 1.35em;
+  color: var(--rose);
+  margin-top: 0.1em;
 }
 
-.description {
-  font-family: var(--font-body);
-  font-size: 1.2rem;
-  color: var(--color-text);
-  margin-bottom: 3rem;
-  line-height: 1.8;
-  max-width: 450px;
-  font-weight: 300;
+.welcome-text {
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  max-width: 24rem;
 }
 
-.start-button {
-  padding: 1.2rem 3.5rem;
-  font-size: 1.1rem;
-  font-family: var(--font-body);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
-  color: white;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  font-weight: 600;
-  box-shadow: 0 10px 25px rgba(190, 18, 60, 0.4);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.start-button:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(190, 18, 60, 0.5);
-  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
-}
-
-.start-button:active {
-  transform: translateY(-2px);
-}
-
-/* Debug Menu - Discrete */
-.debug-menu {
-  margin-top: 3rem;
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: var(--radius-md);
-  width: 100%;
-  max-width: 400px;
-}
-
-.debug-menu p {
-  color: var(--color-text);
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-bottom: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  opacity: 0.6;
-}
-
-.debug-buttons {
+.welcome-steps {
+  list-style: none;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  justify-content: center;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 2rem 0;
 }
 
-.debug-buttons button {
-  background: white;
-  border: 1px solid var(--color-secondary);
-  color: var(--color-primary);
-  padding: 0.4rem 0.8rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 600;
-  transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+.welcome-steps li {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  color: var(--muted);
 }
 
-.debug-buttons button:hover {
-  background: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
-  transform: translateY(-2px);
+.welcome-steps li.done {
+  background: var(--wine);
+  border-color: var(--wine);
+  color: #fff;
+}
+
+.welcome-steps li.current {
+  background: var(--blush);
+  border-color: var(--rose);
+  color: var(--rose);
+}
+
+.welcome-cta {
+  padding: 1rem 2.25rem;
+  font-size: 1.05rem;
 }

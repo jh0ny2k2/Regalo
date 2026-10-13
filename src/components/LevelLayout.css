@@ -1,0 +1,160 @@
+.level-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 1rem 2.5rem;
+}
+
+.level-topbar {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.progress {
+  flex: 1;
+  display: flex;
+  gap: 6px;
+}
+
+.progress-step {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(122, 31, 61, 0.12);
+  transition: background-color 0.4s ease;
+}
+
+.progress-step.done {
+  background: var(--wine);
+}
+
+.progress-step.current {
+  background: linear-gradient(90deg, var(--rose), #f08ab0);
+  box-shadow: 0 0 0 3px rgba(214, 51, 108, 0.15);
+}
+
+.level-count {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--wine);
+  font-variant-numeric: tabular-nums;
+  min-width: 2.2rem;
+  text-align: right;
+}
+
+.level-count span {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.level-card {
+  width: 100%;
+  max-width: 560px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 2rem 1.5rem;
+}
+
+.level-card.is-wide {
+  max-width: 960px;
+}
+
+.level-page:has(.is-wide) .level-topbar {
+  max-width: 960px;
+}
+
+.level-header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.level-title {
+  font-size: clamp(1.7rem, 5vw, 2.3rem);
+  line-height: 1.15;
+  margin: 0.4rem 0 0.6rem;
+}
+
+.level-subtitle {
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1.55;
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+.level-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* ---------- Celebración ---------- */
+.win-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(42, 23, 29, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.win-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 2.25rem 1.75rem 1.75rem;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.win-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--blush);
+  color: var(--rose);
+  margin-bottom: 0.25rem;
+  animation: beat 1.4s ease-in-out infinite;
+}
+
+.win-card h2 {
+  font-size: 1.6rem;
+}
+
+.win-card p {
+  color: var(--ink-soft);
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .level-page {
+    padding-top: 2rem;
+  }
+
+  .level-card {
+    padding: 2.5rem 2.5rem 2.25rem;
+  }
+}
